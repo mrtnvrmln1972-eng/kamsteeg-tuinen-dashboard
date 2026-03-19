@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kamsteeg Tuinen — Pillar-Cluster Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;color:#1a2e1a;background:#f4f7f0;min-height:100dvh}
+
+/* === HEADER === */
+.dash-header{background:linear-gradient(135deg,#2d5016 0%,#3a6b1e 50%,#4a7c2e 100%);color:#fff;padding:40px 32px 32px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.dash-header h1{font-size:clamp(1.5rem,1.2rem+1.5vw,2.2rem);font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
+.dash-header .sub{font-size:14px;opacity:.85;margin-bottom:20px}
+.stats-row{display:flex;gap:16px;flex-wrap:wrap}
+.stat-card{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:10px;padding:12px 20px;min-width:120px}
+.stat-card .sv{font-size:24px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat-card .sl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+
+/* === VIEW TOGGLE === */
+.view-controls{display:flex;justify-content:center;gap:8px;padding:12px 16px;background:#fff;border-bottom:1px solid #e0e4d8;position:sticky;top:0;z-index:90;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.vb{font-family:inherit;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:8px 20px;border-radius:20px;color:#5a6b50;border:1px solid #c8d4bc;cursor:pointer;transition:all .18s ease;background:#fff;flex-shrink:0;white-space:nowrap}
+.vb:hover{color:#2d5016;border-color:#8aa87a}
+.vb.active{color:#fff;background:#3a6b1e;border-color:#3a6b1e}
+
+/* === MAIN CONTENT === */
+.main-wrap{max-width:1200px;margin:0 auto;padding:24px 20px 64px}
+
+/* === SECTION HEADERS === */
+.section-hdr{font-size:20px;font-weight:700;color:#2d5016;margin:32px 0 16px;padding-bottom:8px;border-bottom:2px solid #c8d4bc;display:flex;align-items:center;gap:8px}
+.section-hdr svg{flex-shrink:0}
+
+/* === PAGE CARDS === */
+.pc{border-radius:10px;margin-bottom:8px;overflow:visible;border-left:4px solid transparent;background:var(--uc,#f5f5f5)}
+.pc.lp{border-left-color:#2d5016;border-left-width:5px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.pc.lsp{border-left-color:#5a8c3a;margin-left:24px;margin-bottom:12px}
+.pc.lc{border-left-color:#8aaa6a;margin-left:48px}
+.pc.ll{border-left-color:#b8954f;margin-left:48px}
+
+.ps{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;cursor:pointer;list-style:none;gap:12px}
+.ps::-webkit-details-marker{display:none}
+summary::marker{display:none;content:""}
+.ps:hover{filter:brightness(.97)}
+
+.pm{flex:1;min-width:0}
+.ptr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.ni{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:4px;flex-shrink:0}
+.lp .ni{background:#2d5016;color:#fff}
+.lsp .ni{background:#5a8c3a;color:#fff}
+.lc .ni{background:#8aaa6a;color:#fff}
+.ll .ni{background:#b8954f;color:#fff}
+
+.pt{font-size:16px;font-weight:700;color:#1a2e1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp .pt{font-size:18px}
+
+/* Badges */
+.sb,.tb,.ib{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.sb{border:1px solid}
+.se{color:#2d5016;border-color:#a5c68a;background:#e8f5e9}
+.sn{color:#b8510d;border-color:#f4a460;background:#fff3e0}
+.tb{color:#546e7a;background:#eceff1}
+.ib{font-size:10px}
+.ic{color:#1565c0;background:#e3f2fd}
+.ii{color:#6a1b9a;background:#f3e5f5}
+.io{color:#546e7a;background:#eceff1}
+
+.pur{margin-bottom:4px}
+.ud{font-family:'SF Mono',Consolas,monospace;font-size:12px;color:#3a6b1e;background:rgba(255,255,255,.6);padding:2px 8px;border-radius:4px}
+
+.pst{display:flex;gap:16px;flex-wrap:wrap}
+.si{font-size:12px;color:#5a6b50;display:flex;align-items:center;gap:4px}
+
+.ti{color:#8aaa6a;transition:transform .2s;flex-shrink:0;margin-top:4px;font-size:14px}
+details[open] .ti{transform:rotate(180deg)}
+
+/* Details panel */
+.pd{padding:0 16px 16px;border-top:1px solid rgba(0,0,0,.06)}
+.ct{font-size:13px;color:#5a6b50;background:rgba(255,255,255,.5);padding:10px 12px;border-radius:6px;margin:12px 0;line-height:1.5}
+.ct strong{color:#2d5016}
+
+/* Keyword table */
+.ktw{overflow-x:auto;margin-top:8px;border-radius:6px;border:1px solid rgba(0,0,0,.08)}
+.kt{width:100%;border-collapse:collapse;font-size:13px}
+.kt thead{background:rgba(45,80,22,.08)}
+.kt th{padding:8px 12px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#2d5016;white-space:nowrap}
+.kt td{padding:6px 12px;border-top:1px solid rgba(0,0,0,.04)}
+.kt tbody tr:hover{background:rgba(255,255,255,.5)}
+.r{text-align:right;font-variant-numeric:tabular-nums}
+.kw-empty{padding:12px;color:#999;font-style:italic}
+
+/* Children */
+.children{padding:4px 0 4px 0}
+
+/* === NAVIGATION SECTION === */
+.nav-section{display:none}
+.nav-section.active{display:block}
+.hierarchy-section{display:block}
+.hierarchy-section.hidden{display:none}
+
+.nav-description{background:#fff;border-radius:10px;padding:20px 24px;margin-bottom:24px;border:1px solid #e0e4d8}
+.nav-description h3{font-size:16px;color:#2d5016;margin-bottom:8px}
+.nav-description p{font-size:14px;color:#5a6b50;line-height:1.6;margin-bottom:12px}
+
+.proposed-nav{background:#fff;border-radius:10px;padding:24px;border:1px solid #e0e4d8;margin-bottom:24px}
+.proposed-nav .nav-bar{background:#2d5016;border-radius:8px;padding:14px 24px;display:flex;align-items:center;gap:24px;overflow-x:auto;margin-bottom:24px}
+.proposed-nav .nav-logo{color:#fff;font-weight:700;font-size:16px;white-space:nowrap;flex-shrink:0}
+.proposed-nav .nav-logo span{color:#a5c68a}
+.proposed-nav .nav-items{display:flex;gap:20px;flex:1;justify-content:flex-end}
+.proposed-nav .nav-item{color:rgba(255,255,255,.85);font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;position:relative;padding-bottom:2px}
+.proposed-nav .nav-item:hover{color:#fff}
+.proposed-nav .nav-item::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:#a5c68a;transition:width .3s}
+.proposed-nav .nav-item:hover::after{width:100%}
+
+/* Nav tree */
+.nav-tree{padding:0}
+.nav-tree ul{list-style:none;padding:0}
+.nav-tree>ul>li{margin-bottom:12px}
+.nav-tree .nav-l1>a{display:block;font-size:15px;font-weight:700;color:#2d5016;text-decoration:none;padding:10px 16px;background:#e8f5e9;border-radius:6px;border-left:4px solid #2d5016;transition:background .15s}
+.nav-tree .nav-l1>a:hover{background:#d4edc4}
+.nav-tree .nav-l2{margin-left:24px;margin-top:4px}
+.nav-tree .nav-l2 li{margin-bottom:2px}
+.nav-tree .nav-l2 a{display:block;font-size:13px;color:#3a6b1e;text-decoration:none;padding:6px 12px;border-radius:4px;border-left:3px solid #c8d4bc;transition:all .15s}
+.nav-tree .nav-l2 a:hover{background:#f0f7e8;border-left-color:#3a6b1e}
+.nav-subheader{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8aaa6a;padding:8px 12px 4px;margin-top:4px}
+.nav-divider{height:1px;background:#e0e4d8;margin:4px 0}
+
+/* HTML Code block */
+.code-block{background:#1e1e1e;border-radius:8px;padding:20px;overflow-x:auto;margin-top:16px}
+.code-block pre{color:#d4d4d4;font-family:'SF Mono',Consolas,monospace;font-size:12px;line-height:1.6;white-space:pre}
+.code-block .tag{color:#569cd6}
+.code-block .attr{color:#9cdcfe}
+.code-block .str{color:#ce9178}
+.code-block .cmt{color:#6a9955}
+
+/* Legend */
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:16px 20px;background:#fff;border-radius:8px;border:1px solid #e0e4d8;margin-bottom:24px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#5a6b50}
+.legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
+
+/* URL Color Legend */
+.url-legend{background:#fff;border-radius:10px;padding:16px 20px;border:1px solid #e0e4d8;margin-bottom:24px}
+.url-legend h3{font-size:14px;color:#2d5016;margin-bottom:12px}
+.url-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
+.url-chip{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:12px}
+.url-chip code{font-family:'SF Mono',Consolas,monospace;font-size:11px;color:#2d5016}
+.url-chip .vol{margin-left:auto;font-variant-numeric:tabular-nums;color:#8aaa6a;font-weight:600;font-size:11px;white-space:nowrap}
+
+/* Footer */
+.page-footer{text-align:center;padding:24px;color:#8aaa6a;font-size:12px;border-top:1px solid #e0e4d8;margin-top:40px}
+.page-footer a{color:#5a8c3a;text-decoration:none}
+.page-footer a:hover{text-decoration:underline}
+
+/* Responsive */
+@media(max-width:768px){
+.dash-header{padding:24px 16px}
+.stats-row{gap:8px}
+.stat-card{min-width:80px;padding:8px 12px}
+.stat-card .sv{font-size:18px}
+.main-wrap{padding:16px 12px 48px}
+.pc.lsp{margin-left:12px}
+.pc.lc,.pc.ll{margin-left:24px}
+.ptr{gap:4px}
+.pst{gap:8px}
+.proposed-nav .nav-bar{flex-direction:column;align-items:flex-start;gap:12px}
+.proposed-nav .nav-items{flex-wrap:wrap;gap:12px}
+}
+
+/* Print */
+@media print{
+.dash-header{position:static}
+.view-controls{display:none}
+details{display:block}
+details[open] summary{display:list-item}
+.pc{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="dash-header">
+<h1>Kamsteeg Tuinen — Sitestructuur Dashboard</h1>
+<p class="sub">kamsteegtuinen.nl | Pillar-Cluster Architectuur | Gegenereerd: 18 maart 2026</p>
+<div class="stats-row">
+<div class="stat-card"><div class="sv">34</div><div class="sl">Pagina's</div></div>
+<div class="stat-card"><div class="sv">5</div><div class="sl">Pillar Pages</div></div>
+<div class="stat-card"><div class="sv">493</div><div class="sl">Zoekwoorden</div></div>
+<div class="stat-card"><div class="sv">178.350</div><div class="sl">Totaal Volume</div></div>
+<div class="stat-card"><div class="sv">11</div><div class="sl">Bestaand</div></div>
+<div class="stat-card"><div class="sv">23</div><div class="sl">Nieuw</div></div>
+</div>
+</header>
+
+<!-- VIEW TOGGLE -->
+<div class="view-controls">
+<button class="vb active" data-view="hierarchy" onclick="switchView('hierarchy')">Pillar-Cluster Hiërarchie</button>
+<button class="vb" data-view="nav" onclick="switchView('nav')">Navigatiestructuur</button>
+<button class="vb" data-view="urls" onclick="switchView('urls')">URL Kleurenlegenda</button>
+</div>
+
+<div class="main-wrap">
+
+<!-- ============ HIERARCHY VIEW ============ -->
+<section class="hierarchy-section" id="view-hierarchy">
+
+<div class="legend">
+<div class="legend-item"><span class="legend-swatch" style="background:#2d5016"></span> Pillar Page</div>
+<div class="legend-item"><span class="legend-swatch" style="background:#5a8c3a"></span> Sub-Pillar</div>
+<div class="legend-item"><span class="legend-swatch" style="background:#8aaa6a"></span> Clusterpagina</div>
+<div class="legend-item"><span class="legend-swatch" style="background:#b8954f"></span> Lokale Pagina</div>
+<div class="legend-item"><span class="sb se" style="font-size:11px">Bestaand</span></div>
+<div class="legend-item"><span class="sb sn" style="font-size:11px">Nieuw</span></div>
+</div>
+
+<div class="section-hdr">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d5016" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 3v18"/></svg>
+Pillar-Cluster Structuur (34 pagina's)
+</div>
+
+<article class="pc lp" style="--uc:#b39ddb">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Pillar</span><span class="pt">Tuinontwerp</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/tuinontwerp/</code></div>
+<div class="pst"><span class="si">📊 8.120 vol/mnd</span><span class="si">🔑 7 zoekwoorden</span><span class="si">🔍 tuinontwerp</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Dienst-landingspagina: wat biedt Kamsteeg op vlak van tuinontwerp, proces (intake→ontwerp→uitvoering), portfolio voorbeelden, CTA offerte aanvragen. Integreer USP 25+ jaar ervaring.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinontwerp</td><td class="r">4.400</td><td><span class="ib ic">Com</span></td><td class="r">€2.17</td></tr>
+<tr><td>tuinontwerp maken</td><td class="r">1.600</td><td><span class="ib ii">Info</span></td><td class="r">€1.32</td></tr>
+<tr><td>tuinontwerp laten maken</td><td class="r">1.000</td><td><span class="ib ic">Com</span></td><td class="r">€3.17</td></tr>
+<tr><td>tuinontwerper</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€2.19</td></tr>
+<tr><td>tuin laten ontwerpen</td><td class="r">260</td><td><span class="ib io">Transa</span></td><td class="r">€4.14</td></tr>
+<tr><td>tuinplan</td><td class="r">260</td><td><span class="ib ii">Info</span></td><td class="r">€1.46</td></tr>
+<tr><td>tuinontwerp kosten</td><td class="r">210</td><td><span class="ib io">Transa</span></td><td class="r">€1.90</td></tr>
+</tbody></table></div>
+</div></details><div class="children"><article class="pc lc" style="--uc:#ffca28">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuinarchitect</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/tuinontwerp/tuinarchitect/</code></div>
+<div class="pst"><span class="si">📊 1.900 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 tuinarchitect</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Informatief: wat doet een tuinarchitect vs. hovenier, wanneer heb je er een nodig, kosten indicatie. Positioneer Kamsteeg als alternatief (ontwerp + uitvoering in één hand).</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinarchitect</td><td class="r">1.900</td><td><span class="ib ic">Com</span></td><td class="r">€2.84</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#aed581">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Beplantingsplan</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinontwerp/beplantingsplan/</code></div>
+<div class="pst"><span class="si">📊 720 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 beplantingsplan</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Dienst-subpagina: beplantingsplan als onderdeel van tuinontwerp, proces, voorbeelden per tuinstijl, seizoensindeling.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>beplantingsplan</td><td class="r">720</td><td><span class="ib ii">Info</span></td><td class="r">€1.48</td></tr>
+</tbody></table></div>
+</div></details></article>
+</div></article>
+<article class="pc lp" style="--uc:#b3e5fc">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Pillar</span><span class="pt">Tuinaanleg</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/</code></div>
+<div class="pst"><span class="si">📊 10.680 vol/mnd</span><span class="si">🔑 89 zoekwoorden</span><span class="si">🔍 tuinaanleg</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Hoofddienstpagina: overzicht alle diensten onder tuinaanleg, kostenindicaties, proces van intake tot oplevering, voorbeeldprojecten, CTA.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinaanleg</td><td class="r">2.400</td><td><span class="ib ic">Com</span></td><td class="r">€2.78</td></tr>
+<tr><td>tuin aanleggen kosten</td><td class="r">880</td><td><span class="ib io">Transa</span></td><td class="r">€2.49</td></tr>
+<tr><td>tuinaanleg kosten</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€2.19</td></tr>
+<tr><td>kosten tuinaanleg</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€2.19</td></tr>
+<tr><td>tuin laten aanleggen</td><td class="r">210</td><td><span class="ib io">Transa</span></td><td class="r">€4.52</td></tr>
+<tr><td>tuinaanleg eindhoven</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€5.94</td></tr>
+<tr><td>tuinaanleg modern</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€0.73</td></tr>
+<tr><td>tuinaanleg rotterdam</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€2.61</td></tr>
+<tr><td>vajon tuinaanleg vajon wegenbouw reviews</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€5.32</td></tr>
+<tr><td>tuinaanleg almere</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€5.26</td></tr>
+<tr><td>tuinaanleg met grassen</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€0.07</td></tr>
+<tr><td>tuinaanleg zoetermeer</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€5.02</td></tr>
+<tr><td>tuinaanleg groningen</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€4.41</td></tr>
+<tr><td>tuinaanleg zwolle</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€3.70</td></tr>
+<tr><td>voorbeelden tuinaanleg</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€1.21</td></tr>
+<tr><td>tuinaanleg offerte</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€10.73</td></tr>
+<tr><td>offertes tuinaanleg</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€10.73</td></tr>
+<tr><td>voorbeelden van tuinaanleg</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€1.21</td></tr>
+<tr><td>tuinaanleg offertes</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€10.73</td></tr>
+<tr><td>floradek tuinaanleg</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg service eemnes</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.65</td></tr>
+<tr><td>offerte tuinaanleg</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€10.73</td></tr>
+<tr><td>hoveniers tuinaanleg</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.71</td></tr>
+<tr><td>complete tuinaanleg</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€3.04</td></tr>
+<tr><td>tuinaanleg gouda</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€4.33</td></tr>
+<tr><td>tuinaanleg oosterhout</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€4.09</td></tr>
+<tr><td>tuinaanleg den haag</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€3.38</td></tr>
+<tr><td>tuinaanleg barendrecht</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.90</td></tr>
+<tr><td>tuinaanleg geldermalsen</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>vajon tuinaanleg vajon wegenbouw</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>hovenier tuinaanleg</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.71</td></tr>
+<tr><td>tuinaanleg ridderkerk</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€4.07</td></tr>
+<tr><td>tuinaanleg amersfoort</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€5.62</td></tr>
+<tr><td>tuinaanleg amsterdam</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€7.23</td></tr>
+<tr><td>voorbeeld offerte tuinaanleg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.66</td></tr>
+<tr><td>tuinaanleg limburg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€4.01</td></tr>
+<tr><td>tuinaanleg fotos</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.01</td></tr>
+<tr><td>tuinaanleg oisterwijk</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€5.13</td></tr>
+<tr><td>tuinaanleg enschede</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.98</td></tr>
+<tr><td>kuipers tuinaanleg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg dordrecht</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.48</td></tr>
+<tr><td>tuinaanleg nijmegen</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€6.47</td></tr>
+<tr><td>tuinaanleg den bosch</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€5.34</td></tr>
+<tr><td>tuinaanleg culemborg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.45</td></tr>
+<tr><td>tuinaanleg spijkenisse</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.14</td></tr>
+<tr><td>tuinaanleg zeeland</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.66</td></tr>
+<tr><td>tuinaanleg utrecht</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€5.05</td></tr>
+<tr><td>tuinaanleg roosendaal</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.63</td></tr>
+<tr><td>tuinaanleg veenendaal</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€4.34</td></tr>
+<tr><td>offerte tuinaanleg voorbeeld</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.66</td></tr>
+<tr><td>tuinaanleg schiedam</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.51</td></tr>
+<tr><td>tuinaanleg friesland</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.39</td></tr>
+<tr><td>exclusieve tuinaanleg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.09</td></tr>
+<tr><td>tuinaanleg bergen op zoom</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.91</td></tr>
+<tr><td>kosten tuinaanleg per m2</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.75</td></tr>
+<tr><td>tuinaanleg putten</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€8.68</td></tr>
+<tr><td>ideeën tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>takken tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>idee voor tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>tuinaanleg pleiter</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg best</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.84</td></tr>
+<tr><td>tuinaanleg kwanten</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.64</td></tr>
+<tr><td>tuinaanleg prinsenbeek</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg bedrijf</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€4.37</td></tr>
+<tr><td>kwanten tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.64</td></tr>
+<tr><td>tuinaanleg deventer</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.82</td></tr>
+<tr><td>tuinaanleg leiden</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€4.90</td></tr>
+<tr><td>wat kost tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.81</td></tr>
+<tr><td>soetendaal tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg lelystad</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.31</td></tr>
+<tr><td>wat kost een tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.81</td></tr>
+<tr><td>aspar tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg alkmaar</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.32</td></tr>
+<tr><td>wat kost tuinaanleg per m2</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.68</td></tr>
+<tr><td>tuinaanleg gert kwanten</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.64</td></tr>
+<tr><td>tuinaanleg waalwijk</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.51</td></tr>
+<tr><td>tuinaanleg ede</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.30</td></tr>
+<tr><td>tuinaanleg materialen</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg apeldoorn</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.02</td></tr>
+<tr><td>tuinaanleg vught</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg takken</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg van dorresteijn</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.24</td></tr>
+<tr><td>tuinaanleg bedrijven</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€4.37</td></tr>
+<tr><td>tuinaanleg materiaal</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinaanleg oss</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.72</td></tr>
+<tr><td>tuinaanleg veldhoven</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.54</td></tr>
+<tr><td>ideeën voor tuinaanleg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>tuinaanleg helmond</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.47</td></tr>
+<tr><td>tuinaanleg kosten per m2</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.75</td></tr>
+</tbody></table></div>
+</div></details><div class="children"><article class="pc lc" style="--uc:#ffe082">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuinaanleg Borders</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/borders/</code></div>
+<div class="pst"><span class="si">📊 7.310 vol/mnd</span><span class="si">🔑 3 zoekwoorden</span><span class="si">🔍 tuinaanleg borders</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Specifieke dienst: borders ontwerpen en aanleggen, plantensoorten, seizoensplanning, onderhoud tips. Hoog zoekvolume (3.600).</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinaanleg borders</td><td class="r">3.600</td><td><span class="ib ic">Com</span></td><td class="r">€0.46</td></tr>
+<tr><td>tuinaanleg border</td><td class="r">3.600</td><td><span class="ib ic">Com</span></td><td class="r">€0.46</td></tr>
+<tr><td>border beplanting strakke moderne tuin</td><td class="r">110</td><td><span class="ib io">Transa</span></td><td class="r">€0.08</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#80deea">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuin Renoveren</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/tuin-renoveren/</code></div>
+<div class="pst"><span class="si">📊 1.270 vol/mnd</span><span class="si">🔑 2 zoekwoorden</span><span class="si">🔍 tuin renoveren</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Dienst-subpagina: wanneer renoveren vs. nieuw aanleggen, stappenplan, kostenindicatie, voor/na voorbeelden.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuin renoveren</td><td class="r">880</td><td><span class="ib ii">Info</span></td><td class="r">€2.85</td></tr>
+<tr><td>tuin verbouwen</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€3.12</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lsp" style="--uc:#bcaaa4">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Sub-pillar</span><span class="pt">Zwemvijver &amp; Waterpartij</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/zwemvijver/</code></div>
+<div class="pst"><span class="si">📊 11.360 vol/mnd</span><span class="si">🔑 46 zoekwoorden</span><span class="si">🔍 zwemvijver</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Specialisatie-pagina: natuurlijke zwemvijvers, aanlegproces, kostenindicatie (€15K-€50K+), onderhoud, vergunningen. Portfolio prominenter.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>zwemvijver</td><td class="r">3.600</td><td><span class="ib ii">Info</span></td><td class="r">€2.27</td></tr>
+<tr><td>zwemvijver aanleg</td><td class="r">720</td><td><span class="ib ic">Com</span></td><td class="r">€2.53</td></tr>
+<tr><td>zwemvijver aanleggen</td><td class="r">720</td><td><span class="ib ii">Info</span></td><td class="r">€2.53</td></tr>
+<tr><td>zwemvijver natuurlijk</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€2.21</td></tr>
+<tr><td>natuurlijke zwemvijver</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€2.21</td></tr>
+<tr><td>zwemvijver zelf aanleggen</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€1.76</td></tr>
+<tr><td>kosten zwemvijver</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€2.43</td></tr>
+<tr><td>zwemvijver kosten</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€2.43</td></tr>
+<tr><td>zelf een zwemvijver aanleggen</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.76</td></tr>
+<tr><td>zelf zwemvijver aanleggen</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€1.76</td></tr>
+<tr><td>zwemvijver klein</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€1.92</td></tr>
+<tr><td>kleine zwemvijver</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€1.92</td></tr>
+<tr><td>zwemvijver oosterpark</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>mini zwemvijver</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€0.79</td></tr>
+<tr><td>wat kost een zwemvijver</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€1.68</td></tr>
+<tr><td>zwemvijver modern</td><td class="r">140</td><td><span class="ib ii">Info</span></td><td class="r">€1.66</td></tr>
+<tr><td>camping met zwemvijver</td><td class="r">140</td><td><span class="ib ii">Info</span></td><td class="r">€0.67</td></tr>
+<tr><td>moderne zwemvijver</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€1.66</td></tr>
+<tr><td>camping zwemvijver</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€0.67</td></tr>
+<tr><td>campings met zwemvijver</td><td class="r">140</td><td><span class="ib ii">Info</span></td><td class="r">€0.67</td></tr>
+<tr><td>nadelen zwemvijver</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>zwemvijver prijs</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€2.03</td></tr>
+<tr><td>prijs zwemvijver</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.03</td></tr>
+<tr><td>zwemvijver tuin</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.53</td></tr>
+<tr><td>zwemvijver in kleine tuin</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€1.21</td></tr>
+<tr><td>zwemvijver onderhoud</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.63</td></tr>
+<tr><td>onderhoud zwemvijver</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.63</td></tr>
+<tr><td>natuur zwemvijver</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€1.97</td></tr>
+<tr><td>zwemvijver kleine tuin</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€1.21</td></tr>
+<tr><td>zwemvijver maken</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€4.74</td></tr>
+<tr><td>zwemvijver onderhouden</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€2.63</td></tr>
+<tr><td>zwemvijver in tuin</td><td class="r">110</td><td><span class="ib ii">Info</span></td><td class="r">€2.53</td></tr>
+<tr><td>aanleg natuurlijke zwemvijver</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.36</td></tr>
+<tr><td>natuurlijke zwemvijver aanleggen</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.36</td></tr>
+<tr><td>kosten aanleg zwemvijver</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.88</td></tr>
+<tr><td>skimmer zwemvijver</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€0.95</td></tr>
+<tr><td>zwemvijver expert</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>planten zwemvijver</td><td class="r">70</td><td><span class="ib ii">Info</span></td><td class="r">€2.05</td></tr>
+<tr><td>zwemvijver kosten aanleg</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.88</td></tr>
+<tr><td>aanleg zwemvijver</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.18</td></tr>
+<tr><td>verwarmen zwemvijver</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€1.81</td></tr>
+<tr><td>skimmer voor zwemvijver</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€0.95</td></tr>
+<tr><td>hybride zwemvijver</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.88</td></tr>
+<tr><td>kosten zwemvijver aanleggen</td><td class="r">70</td><td><span class="ib ii">Info</span></td><td class="r">€2.88</td></tr>
+<tr><td>verwarmde zwemvijver</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€1.81</td></tr>
+<tr><td>skimmers zwemvijver</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€0.95</td></tr>
+</tbody></table></div>
+</div></details><div class="children"><article class="pc lc" style="--uc:#e6ee9c">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuin met Zwembad</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/zwemvijver/tuin-met-zwembad/</code></div>
+<div class="pst"><span class="si">📊 6.040 vol/mnd</span><span class="si">🔑 4 zoekwoorden</span><span class="si">🔍 tuin met zwembad</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Inspiratie + dienst: verschil zwembad vs. zwemvijver, ontwerpmogelijkheden, kosten, vergunningen. SERP toont veel inspiratie-content.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>zwembad tuin</td><td class="r">3.600</td><td><span class="ib ii">Info</span></td><td class="r">€0.58</td></tr>
+<tr><td>tuin met zwembad</td><td class="r">2.400</td><td><span class="ib ii">Info</span></td><td class="r">€1.45</td></tr>
+<tr><td>moderne tuin met zwembad</td><td class="r">30</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>poolhouse tuin</td><td class="r">10</td><td><span class="ib ii">Info</span></td><td class="r">€0.51</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#81d4fa">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Vijver &amp; Waterpartij</span><span class="sb sn">Nieuw</span><span class="tb">Clusterpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/zwemvijver/waterpartij/</code></div>
+<div class="pst"><span class="si">📊 990 vol/mnd</span><span class="si">🔑 4 zoekwoorden</span><span class="si">🔍 waterpartij tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Dienst-subpagina: sierlijke waterpartijen en vijvers als alternatief voor zwemvijver, typen (fontein, beekje, spiegelvijver), kosten.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>vijver tuin</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€0.45</td></tr>
+<tr><td>waterpartij tuin</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€0.27</td></tr>
+<tr><td>vijver aanleg</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€2.54</td></tr>
+<tr><td>tuin met vijver</td><td class="r">70</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+</tbody></table></div>
+</div></details></article>
+</div></article>
+<article class="pc lc" style="--uc:#9fa8da">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Stadstuin</span><span class="sb se">Bestaand</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/stadstuin/</code></div>
+<div class="pst"><span class="si">📊 2.400 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 stadstuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: kenmerken stadstuin, ontwerpprincipes (compact, slim ruimtegebruik), materialen, beplanting. Portfolio stadstuin-projecten Breda.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>stadstuin</td><td class="r">2.400</td><td><span class="ib ii">Info</span></td><td class="r">€1.28</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#80cbc4">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Moderne Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/moderne-tuin/</code></div>
+<div class="pst"><span class="si">📊 4.630 vol/mnd</span><span class="si">🔑 44 zoekwoorden</span><span class="si">🔍 moderne tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: strakke lijnen, materialen (cortenstaal, siergrind, grote tegels), beplanting, lichtplan. Hoge SERP overlap met inspiratiesites – content moet visueel sterk zijn.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>moderne tuin</td><td class="r">1.000</td><td><span class="ib ii">Info</span></td><td class="r">€1.26</td></tr>
+<tr><td>strakke tuin</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€0.86</td></tr>
+<tr><td>moderne tuin ideeën</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.30</td></tr>
+<tr><td>moderne tuin idee</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.30</td></tr>
+<tr><td>moderne tuin ideeen</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.30</td></tr>
+<tr><td>moderne tuin beplanting</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.41</td></tr>
+<tr><td>beplanting moderne tuin</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.41</td></tr>
+<tr><td>strakke moderne tuin</td><td class="r">110</td><td><span class="ib io">Transa</span></td><td class="r">€1.08</td></tr>
+<tr><td>moderne tuin met grind</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€0.98</td></tr>
+<tr><td>moderne tuin inspiratie</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€1.25</td></tr>
+<tr><td>moderne tuin met siergrassen</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.63</td></tr>
+<tr><td>moderne kunst voor in de tuin</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€0.23</td></tr>
+<tr><td>moderne fontein tuin</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€0.22</td></tr>
+<tr><td>moderne fonteinen tuin</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€0.22</td></tr>
+<tr><td>kleine moderne tuin</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€1.04</td></tr>
+<tr><td>moderne kleine tuin</td><td class="r">90</td><td><span class="ib ii">Info</span></td><td class="r">€1.04</td></tr>
+<tr><td>ontwerp moderne tuin</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.10</td></tr>
+<tr><td>moderne tuin ontwerpen</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.10</td></tr>
+<tr><td>moderne tuin ontwerp</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.10</td></tr>
+<tr><td>moderne japanse tuin</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€0.35</td></tr>
+<tr><td>moderne landelijke tuin</td><td class="r">70</td><td><span class="ib ii">Info</span></td><td class="r">€0.50</td></tr>
+<tr><td>moderne strakke tuin</td><td class="r">70</td><td><span class="ib io">Transa</span></td><td class="r">€0.66</td></tr>
+<tr><td>moderne tuin planten</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.29</td></tr>
+<tr><td>moderne tuin aanleggen</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€2.15</td></tr>
+<tr><td>moderne ibiza tuin</td><td class="r">50</td><td><span class="ib io">Transa</span></td><td class="r">€0.53</td></tr>
+<tr><td>voorbeeld moderne tuin</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€1.04</td></tr>
+<tr><td>planten voor moderne tuin</td><td class="r">50</td><td><span class="ib io">Transa</span></td><td class="r">€0.29</td></tr>
+<tr><td>planten moderne tuin</td><td class="r">50</td><td><span class="ib io">Transa</span></td><td class="r">€0.29</td></tr>
+<tr><td>voorbeelden moderne tuin</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€1.04</td></tr>
+<tr><td>olijfboom in moderne tuin</td><td class="r">50</td><td><span class="ib io">Transa</span></td><td class="r">€0.09</td></tr>
+<tr><td>aanleg moderne tuin</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.15</td></tr>
+<tr><td>moderne tuin voorbeelden</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€1.04</td></tr>
+<tr><td>moderne tuin ronde vormen</td><td class="r">40</td><td><span class="ib io">Transa</span></td><td class="r">€0.38</td></tr>
+<tr><td>moderne lantaarnpaal tuin</td><td class="r">40</td><td><span class="ib io">Transa</span></td><td class="r">€0.94</td></tr>
+<tr><td>inspiratie moderne tuin</td><td class="r">40</td><td><span class="ib ii">Info</span></td><td class="r">€0.63</td></tr>
+<tr><td>moderne cottage tuin</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.25</td></tr>
+<tr><td>moderne tuin met gras</td><td class="r">40</td><td><span class="ib ii">Info</span></td><td class="r">€1.02</td></tr>
+<tr><td>strakke moderne kleine tuin</td><td class="r">40</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>moderne schutting tuin</td><td class="r">40</td><td><span class="ib io">Transa</span></td><td class="r">€0.60</td></tr>
+<tr><td>moderne tuin met grassen</td><td class="r">40</td><td><span class="ib io">Transa</span></td><td class="r">€1.02</td></tr>
+<tr><td>moderne mediterrane tuin</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.55</td></tr>
+<tr><td>moderne tuin met cortenstaal</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.55</td></tr>
+<tr><td>beplanting strakke moderne tuin</td><td class="r">20</td><td><span class="ib io">Transa</span></td><td class="r">€0.00</td></tr>
+<tr><td>landelijke moderne tuin</td><td class="r">20</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#f48fb1">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Landelijke Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/landelijke-tuin/</code></div>
+<div class="pst"><span class="si">📊 1.090 vol/mnd</span><span class="si">🔑 2 zoekwoorden</span><span class="si">🔍 landelijke tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: kenmerken landelijke stijl, hagen, borders, vaste planten, paden. SERP toont blog/magazine content – eigen content moet diepgaand + visueel.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>landelijke tuin</td><td class="r">880</td><td><span class="ib ii">Info</span></td><td class="r">€0.56</td></tr>
+<tr><td>romantische tuin</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€0.81</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#90caf9">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Ecologische Tuin</span><span class="sb se">Bestaand</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/ecologische-tuin/</code></div>
+<div class="pst"><span class="si">📊 870 vol/mnd</span><span class="si">🔑 16 zoekwoorden</span><span class="si">🔍 ecologische tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: biodiversiteit, inheemse planten, insectenhotels, regenwateropvang. SERP toont informatieve/how-to pagina&#x27;s. Link naar duurzaamheid USP.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>ecologische tuin</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€1.72</td></tr>
+<tr><td>duurzame tuin</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€1.06</td></tr>
+<tr><td>ecologische tuin ontwerpen</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.13</td></tr>
+<tr><td>ecologische tuin van aanleg tot beheer</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€2.45</td></tr>
+<tr><td>ecologische tuin: van aanleg tot beheer</td><td class="r">30</td><td><span class="ib ii">Info</span></td><td class="r">€2.45</td></tr>
+<tr><td>ecologische tuin aanleggen</td><td class="r">20</td><td><span class="ib ii">Info</span></td><td class="r">€1.07</td></tr>
+<tr><td>ecologische tuin ideeën</td><td class="r">20</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>ecologische tuin ideeen</td><td class="r">20</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>velt ecologische tuin</td><td class="r">10</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>wat is een ecologische tuin</td><td class="r">10</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>ecologische tuin arnhem</td><td class="r">10</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>ecologische afboording tuin</td><td class="r">10</td><td><span class="ib io">Transa</span></td><td class="r">€0.00</td></tr>
+<tr><td>ecologische tuin velt</td><td class="r">10</td><td><span class="ib io">Naviga</span></td><td class="r">€0.23</td></tr>
+<tr><td>ecologische vijver in de tuin</td><td class="r">10</td><td><span class="ib io">Transa</span></td><td class="r">€0.00</td></tr>
+<tr><td>ecologische tuin planten</td><td class="r">10</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>kleine ecologische tuin</td><td class="r">10</td><td><span class="ib ic">Com</span></td><td class="r">€0.22</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#fff176">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Natuurlijke Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/natuurlijke-tuin/</code></div>
+<div class="pst"><span class="si">📊 720 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 natuurlijke tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: verschil met ecologische tuin (minder strikt, meer gevoel), wilde bloemenweide, natuurlijke materialen. SERP toont how-to content.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>natuurlijke tuin</td><td class="r">720</td><td><span class="ib ii">Info</span></td><td class="r">€1.22</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#c5e1a5">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Boerderijtuin</span><span class="sb se">Bestaand</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/boerderijtuin/</code></div>
+<div class="pst"><span class="si">📊 210 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 boerderijtuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: grote percelen, overgang landschap-tuin, erfinrichting, beplanting. Relevant voor landelijk Breda-omgeving.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>boerderijtuin</td><td class="r">210</td><td><span class="ib ii">Info</span></td><td class="r">€2.07</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#a5d6a7">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Villatuin</span><span class="sb se">Bestaand</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/villatuin/</code></div>
+<div class="pst"><span class="si">📊 50 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 villatuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: ruime opzet, meerdere &#x27;tuinkamers&#x27;, zwemvijver/terras/buitenkeuken. Portfolio high-end projecten.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>villatuin</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€1.69</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#ce93d8">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Mediterrane Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/mediterrane-tuin/</code></div>
+<div class="pst"><span class="si">📊 2.900 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 mediterrane tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: warmtegevoelige planten in NL-klimaat, materialen (terracotta, natuursteen), sfeer creëren. Volume 2.900.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>mediterrane tuin</td><td class="r">2.900</td><td><span class="ib ii">Info</span></td><td class="r">€0.81</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#ef9a9a">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Strandtuin</span><span class="sb se">Bestaand</span><span class="tb">Tuinstijlpagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/strandtuin/</code></div>
+<div class="pst"><span class="si">📊 170 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 strandtuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Tuintype-pagina: siergrassen, zand, loungegevoel, materialen. Niche maar relevant USP.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>strandtuin</td><td class="r">170</td><td><span class="ib ii">Info</span></td><td class="r">€0.22</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#f8bbd0">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Overkapping &amp; Pergola</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span></div>
+<div class="pur"><code class="ud">/blog/overkapping-tuin/</code></div>
+<div class="pst"><span class="si">📊 1.300 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 overkapping tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog/gids: SERP gedomineerd door webshops (70%). Blog met inspiratie + advies. Link naar /tuinaanleg/. Volume overkapping 18.100 maar SERP is shop-intentie – blog approach beter.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>pergola tuin</td><td class="r">1.300</td><td><span class="ib ii">Info</span></td><td class="r">€0.55</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#c5cae9">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuinverlichting</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/tuinverlichting/</code></div>
+<div class="pst"><span class="si">📊 9.900 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 tuinverlichting</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog/gids: SERP 50% webshops. Blog over lichtplan als onderdeel tuinontwerp, soorten verlichting, sfeer. Link naar /tuinontwerp/. Volume 9.900 maar transactioneel – informatieve hoek beter.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinverlichting</td><td class="r">9.900</td><td><span class="ib ii">Info</span></td><td class="r">€1.29</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#e1bee7">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Schutting &amp; Afscheiding</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/schutting-tuin/</code></div>
+<div class="pst"><span class="si">📊 1.390 vol/mnd</span><span class="si">🔑 2 zoekwoorden</span><span class="si">🔍 schutting tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog/gids: SERP voornamelijk webshops. Blog over schutting vs. haag vs. muur, duurzame opties, groene afscheiding. Link naar /tuinaanleg/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>schutting tuin</td><td class="r">1.000</td><td><span class="ib ii">Info</span></td><td class="r">€0.73</td></tr>
+<tr><td>tuinmuur</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€0.33</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#ffccbc">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Voortuin</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/voortuin-ideeën/</code></div>
+<div class="pst"><span class="si">📊 2.900 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 voortuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog: inspiratie voortuinen, groenere straatbeelden, tegels eruit groen erin. SERP toont 50% inspiratie-content. Volume 2.900. Link naar /tuinontwerp/ en /tuinaanleg/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>voortuin</td><td class="r">2.900</td><td><span class="ib ii">Info</span></td><td class="r">€1.22</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#ffe0b2">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Kleine Tuin Inrichten</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/kleine-tuin-inrichten/</code></div>
+<div class="pst"><span class="si">📊 1.780 vol/mnd</span><span class="si">🔑 2 zoekwoorden</span><span class="si">🔍 kleine tuin inrichten</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog: ruimtebesparende trucjes, verticaal groen, spiegels, niveauverschil. SERP 100% inspiratie/how-to. Link naar /tuinaanleg/stadstuin/ en /tuinontwerp/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>achtertuin</td><td class="r">1.300</td><td><span class="ib ii">Info</span></td><td class="r">€0.41</td></tr>
+<tr><td>kleine tuin inrichten</td><td class="r">480</td><td><span class="ib ii">Info</span></td><td class="r">€1.00</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#dcedc8">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Kindvriendelijke Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/kindvriendelijke-tuin/</code></div>
+<div class="pst"><span class="si">📊 320 vol/mnd</span><span class="si">🔑 1 zoekwoorden</span><span class="si">🔍 kindvriendelijke tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog: veilige beplanting, speelzones, waterveiligheid, onderhoudsarm. SERP toont how-to. Link naar /tuinontwerp/ en /tuinaanleg/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>kindvriendelijke tuin</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€0.49</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#b2dfdb">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuin Inspiratie &amp; Ideeën</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/tuin-inspiratie/</code></div>
+<div class="pst"><span class="si">📊 25.870 vol/mnd</span><span class="si">🔑 5 zoekwoorden</span><span class="si">🔍 tuin inspiratie</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Inspiratie-overzicht: visueel rijk, tuinstijlen samengevat met links naar specifieke stijlpagina&#x27;s. Jaarlijks updaten met trends. SERP 70% inspiratiesites. Volume 10.200 gecombineerd.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>japanse tuin</td><td class="r">14.800</td><td><span class="ib ii">Info</span></td><td class="r">€0.28</td></tr>
+<tr><td>tuin ideeën</td><td class="r">6.600</td><td><span class="ib ii">Info</span></td><td class="r">€0.83</td></tr>
+<tr><td>tuin inspiratie</td><td class="r">3.600</td><td><span class="ib ii">Info</span></td><td class="r">€1.15</td></tr>
+<tr><td>tropische tuin</td><td class="r">480</td><td><span class="ib ii">Info</span></td><td class="r">€0.28</td></tr>
+<tr><td>siergrassen tuin</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€0.20</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#ffcdd2">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Bedrijfstuin &amp; Zakelijk Groen</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/bedrijfstuin/</code></div>
+<div class="pst"><span class="si">📊 3.000 vol/mnd</span><span class="si">🔑 8 zoekwoorden</span><span class="si">🔍 bedrijfstuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">B2B landingspagina: kantoortuinen, bedrijfsterreinen, restauranttuinen, groenvoorziening. Aparte CTA voor zakelijke klanten. Portfolio zakelijke projecten.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>groenvoorziening</td><td class="r">1.600</td><td><span class="ib ii">Info</span></td><td class="r">€3.41</td></tr>
+<tr><td>kantoortuin</td><td class="r">1.000</td><td><span class="ib ii">Info</span></td><td class="r">€2.44</td></tr>
+<tr><td>bedrijfstuin</td><td class="r">140</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>groenbeheer</td><td class="r">140</td><td><span class="ib ii">Info</span></td><td class="r">€4.31</td></tr>
+<tr><td>restaurant tuin</td><td class="r">70</td><td><span class="ib ii">Info</span></td><td class="r">€0.02</td></tr>
+<tr><td>buitenleven tuin</td><td class="r">20</td><td><span class="ib ii">Info</span></td><td class="r">€1.78</td></tr>
+<tr><td>terrein inrichting</td><td class="r">20</td><td><span class="ib ii">Info</span></td><td class="r">€2.34</td></tr>
+<tr><td>tuinbeveiliging</td><td class="r">10</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc lc" style="--uc:#fff9c4">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Tuin op het Zuiden</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/tuin-op-het-zuiden/</code></div>
+<div class="pst"><span class="si">📊 580 vol/mnd</span><span class="si">🔑 2 zoekwoorden</span><span class="si">🔍 tuin op het zuiden</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog: beplantingsadvies zonverdeling, schaduwplekken creëren, bescherming. Link naar /tuinontwerp/beplantingsplan/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuin op het zuiden</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>schaduw tuin</td><td class="r">260</td><td><span class="ib ii">Info</span></td><td class="r">€0.24</td></tr>
+</tbody></table></div>
+</div></details></article>
+</div></article>
+<article class="pc lp" style="--uc:#ffab91">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Pillar</span><span class="pt">Tuinonderhoud</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/tuinonderhoud/</code></div>
+<div class="pst"><span class="si">📊 6.760 vol/mnd</span><span class="si">🔑 91 zoekwoorden</span><span class="si">🔍 tuinonderhoud</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Hoofddienstpagina: abonnementen, seizoensgebonden werkzaamheden, kosten, verschil particulier vs. zakelijk, CTA.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>tuinonderhoud</td><td class="r">1.600</td><td><span class="ib ic">Com</span></td><td class="r">€2.96</td></tr>
+<tr><td>groenonderhoud</td><td class="r">260</td><td><span class="ib ii">Info</span></td><td class="r">€6.28</td></tr>
+<tr><td>abonnement tuinonderhoud</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€1.86</td></tr>
+<tr><td>tuinonderhoud abonnement</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€1.86</td></tr>
+<tr><td>tuinonderhoud emmen</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€2.96</td></tr>
+<tr><td>tuinonderhoud rotterdam</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€3.33</td></tr>
+<tr><td>tuinonderhoud bedrijf</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€3.70</td></tr>
+<tr><td>tuinonderhoud maart</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€0.31</td></tr>
+<tr><td>tuinonderhoud bedrijven</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€3.70</td></tr>
+<tr><td>tuinonderhoud zoetermeer</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.51</td></tr>
+<tr><td>hulp bij tuinonderhoud</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.11</td></tr>
+<tr><td>tuinonderhoud zuyd</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.37</td></tr>
+<tr><td>hulp tuinonderhoud</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.11</td></tr>
+<tr><td>tuinonderhoud apeldoorn</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€3.02</td></tr>
+<tr><td>tuinonderhoud groningen</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.41</td></tr>
+<tr><td>tuinonderhoud den haag</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€4.06</td></tr>
+<tr><td>tuinonderhoud utrecht</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€7.31</td></tr>
+<tr><td>tuinonderhoud ede</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€3.47</td></tr>
+<tr><td>tuinonderhoud oosterhout</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.21</td></tr>
+<tr><td>tuinonderhoud alphen aan den rijn</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.01</td></tr>
+<tr><td>tuinonderhoud drenthe</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.45</td></tr>
+<tr><td>jaarcontract tuinonderhoud</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€1.80</td></tr>
+<tr><td>voorbeeld offerte tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud assen</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.56</td></tr>
+<tr><td>prijzen voor tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.74</td></tr>
+<tr><td>tuinonderhoud eindhoven</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.31</td></tr>
+<tr><td>valenkamp tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>offerte tuinonderhoud voorbeeld</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud den bosch</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.67</td></tr>
+<tr><td>prijzen tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.74</td></tr>
+<tr><td>tuinonderhoud zwolle</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.86</td></tr>
+<tr><td>tuinonderhoud roosendaal</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.27</td></tr>
+<tr><td>tuinonderhoud zutphen</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€2.14</td></tr>
+<tr><td>mijn tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>parkstad tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud kosten</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.17</td></tr>
+<tr><td>tuinonderhoud veenendaal</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.14</td></tr>
+<tr><td>tuinonderhoud amsterdam</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€9.79</td></tr>
+<tr><td>tuinonderhoud almere</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€4.20</td></tr>
+<tr><td>kosten tuinonderhoud</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.17</td></tr>
+<tr><td>tuinonderhoud culemborg</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.00</td></tr>
+<tr><td>tuinonderhoud veldhoven</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.47</td></tr>
+<tr><td>tuinonderhoud zeeland</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.17</td></tr>
+<tr><td>tuinonderhoud nijmegen</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.95</td></tr>
+<tr><td>tuinonderhoud barendrecht</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.68</td></tr>
+<tr><td>tuinonderhoud in de buurt</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.93</td></tr>
+<tr><td>tuinonderhoud prijzen</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.74</td></tr>
+<tr><td>tuinonderhoud ridderkerk</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€1.59</td></tr>
+<tr><td>tuinonderhoud bergen op zoom</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.82</td></tr>
+<tr><td>tuinonderhoud harderwijk</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.67</td></tr>
+<tr><td>vrijwilliger tuinonderhoud</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.84</td></tr>
+<tr><td>tuinonderhoud amersfoort</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€3.55</td></tr>
+<tr><td>tuinonderhoud venlo</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€4.57</td></tr>
+<tr><td>tuinonderhoud deventer</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.40</td></tr>
+<tr><td>wat kost tuinonderhoud</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.55</td></tr>
+<tr><td>tuinonderhoud arnhem</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€4.66</td></tr>
+<tr><td>tuinonderhoud lelystad</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€3.74</td></tr>
+<tr><td>tuinonderhoud waalwijk</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud mol</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud spijkenisse</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.27</td></tr>
+<tr><td>vrijwilligers tuinonderhoud</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.84</td></tr>
+<tr><td>tuinonderhoud dordrecht</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.96</td></tr>
+<tr><td>tuinonderhoud hengelo</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€5.24</td></tr>
+<tr><td>tuinonderhoud waddinxveen</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud enschede</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€2.45</td></tr>
+<tr><td>tuinonderhoud en btw</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud almelo</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€3.85</td></tr>
+<tr><td>tuinonderhoud uden</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€4.15</td></tr>
+<tr><td>tuinonderhoud winter</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€1.66</td></tr>
+<tr><td>tuinonderhoud hellevoetsluis</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€2.15</td></tr>
+<tr><td>btw op tuinonderhoud</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>btw tuinonderhoud</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud borne</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€3.05</td></tr>
+<tr><td>tuinonderhoud oktober</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud brielle</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€5.92</td></tr>
+<tr><td>klein tuinonderhoud</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.85</td></tr>
+<tr><td>tuinonderhoud purmerend</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.02</td></tr>
+<tr><td>ad visser tuinonderhoud</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuinonderhoud oud beijerland</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.47</td></tr>
+<tr><td>tuinonderhoud maastricht</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€2.23</td></tr>
+<tr><td>tuinonderhoud van bennekom</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>offerte tuinonderhoud</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€5.00</td></tr>
+<tr><td>donkergroen tuinonderhoud</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.37</td></tr>
+<tr><td>tuinonderhoud oostvoorne</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.02</td></tr>
+<tr><td>tuinonderhoud prinsenbeek</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.88</td></tr>
+<tr><td>kosten tuinonderhoud per m2</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.08</td></tr>
+<tr><td>tuinonderhoud oldenzaal</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€2.05</td></tr>
+<tr><td>tuinonderhoud in oktober</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>goedkope tuinonderhoud</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.37</td></tr>
+<tr><td>tuinonderhoud maassluis</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.48</td></tr>
+<tr><td>tuinonderhoud epe</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€2.61</td></tr>
+</tbody></table></div>
+</div></details><div class="children"><article class="pc lc" style="--uc:#bbdefb">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Cluster</span><span class="pt">Onderhoudsarme Tuin</span><span class="sb sn">Nieuw</span><span class="tb">Blog/Gids</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/blog/onderhoudsarme-tuin/</code></div>
+<div class="pst"><span class="si">📊 1.170 vol/mnd</span><span class="si">🔑 3 zoekwoorden</span><span class="si">🔍 onderhoudsarme tuin</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Blog/gids: tips voor onderhoudsarm tuinontwerp, plantenkeuze, verhardingsmateriaal, SERP toont how-to content. Link terug naar /tuinonderhoud/ en /tuinontwerp/.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>onderhoudsarme tuin</td><td class="r">880</td><td><span class="ib ii">Info</span></td><td class="r">€1.04</td></tr>
+<tr><td>onderhoudsvriendelijke tuin</td><td class="r">260</td><td><span class="ib ii">Info</span></td><td class="r">€0.87</td></tr>
+<tr><td>moderne onderhoudsvrije tuin</td><td class="r">30</td><td><span class="ib io">Transa</span></td><td class="r">€0.18</td></tr>
+</tbody></table></div>
+</div></details></article>
+</div></article>
+<article class="pc lp" style="--uc:#b2ebf2">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Pillar</span><span class="pt">Hovenier</span><span class="sb sn">Nieuw</span><span class="tb">Landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/hovenier/</code></div>
+<div class="pst"><span class="si">📊 43.570 vol/mnd</span><span class="si">🔑 86 zoekwoorden</span><span class="si">🔍 hovenier</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Generieke &#x27;hovenier&#x27; landingspagina: wie is Kamsteeg, diensten overzicht, werkgebied, USP&#x27;s (25+ jaar, B2B+B2C, Breda e.o.), reviews/portfolio.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>hovenier</td><td class="r">12.100</td><td><span class="ib ic">Com</span></td><td class="r">€2.61</td></tr>
+<tr><td>hoveniersbedrijf</td><td class="r">5.400</td><td><span class="ib ic">Com</span></td><td class="r">€3.03</td></tr>
+<tr><td>tuinman</td><td class="r">2.400</td><td><span class="ib ic">Com</span></td><td class="r">€2.88</td></tr>
+<tr><td>hovenier jansen</td><td class="r">880</td><td><span class="ib ic">Com</span></td><td class="r">€1.97</td></tr>
+<tr><td>hovenier den haag</td><td class="r">720</td><td><span class="ib ic">Com</span></td><td class="r">€6.14</td></tr>
+<tr><td>hovenier rotterdam</td><td class="r">590</td><td><span class="ib ic">Com</span></td><td class="r">€4.35</td></tr>
+<tr><td>hovenier zwolle</td><td class="r">590</td><td><span class="ib ic">Com</span></td><td class="r">€3.63</td></tr>
+<tr><td>hovenier groningen</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€3.51</td></tr>
+<tr><td>hovenier amsterdam</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€5.96</td></tr>
+<tr><td>hovenier utrecht</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€7.03</td></tr>
+<tr><td>wat kost hovenier per uur</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€1.47</td></tr>
+<tr><td>wat kost een hovenier per uur</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€1.47</td></tr>
+<tr><td>hovenier almere</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€6.12</td></tr>
+<tr><td>wat is een hovenier</td><td class="r">390</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>hovenier amersfoort</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€5.71</td></tr>
+<tr><td>de hovenier</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>wat is hovenier</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>hovenier apeldoorn</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€3.60</td></tr>
+<tr><td>wat verdiend een hovenier</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.62</td></tr>
+<tr><td>jonker hovenier</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€3.02</td></tr>
+<tr><td>ecologische hovenier</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.45</td></tr>
+<tr><td>ecologisch hovenier</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.45</td></tr>
+<tr><td>hovenier friesland</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.99</td></tr>
+<tr><td>hovenier enschede</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€2.94</td></tr>
+<tr><td>hovenier in friesland</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€1.99</td></tr>
+<tr><td>hovenier haarlem</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€5.38</td></tr>
+<tr><td>wat verdient een hovenier</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€1.62</td></tr>
+<tr><td>hovenier eindhoven</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€3.75</td></tr>
+<tr><td>hovenier betekenis</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€1.12</td></tr>
+<tr><td>luijendijk hovenier</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€2.89</td></tr>
+<tr><td>hovenier arnhem</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€7.05</td></tr>
+<tr><td>hovenier zoetermeer</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€3.95</td></tr>
+<tr><td>hovenier nijmegen</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€6.31</td></tr>
+<tr><td>hovenier leiden</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€4.88</td></tr>
+<tr><td>betekenis hovenier</td><td class="r">320</td><td><span class="ib ii">Info</span></td><td class="r">€1.12</td></tr>
+<tr><td>hovenier assen</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€2.76</td></tr>
+<tr><td>hovenier uurloon</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.47</td></tr>
+<tr><td>hovenier den bosch</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€4.57</td></tr>
+<tr><td>uurloon hovenier</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.47</td></tr>
+<tr><td>hovenier zutphen</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€2.91</td></tr>
+<tr><td>hovenier westland</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€3.40</td></tr>
+<tr><td>hovenier uurtarief</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.64</td></tr>
+<tr><td>hovenier deventer</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€2.77</td></tr>
+<tr><td>hoek hovenier</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>hovenier dordrecht</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€3.23</td></tr>
+<tr><td>uurtarief hovenier</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.64</td></tr>
+<tr><td>hovenier hoek</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>don hovenier</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>hovenier in assen</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€2.76</td></tr>
+<tr><td>hovenier ede</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€6.42</td></tr>
+<tr><td>hovenier gouda</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€4.44</td></tr>
+<tr><td>hovenier leeuwarden</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.74</td></tr>
+<tr><td>schouten hovenier</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€0.28</td></tr>
+<tr><td>hovenier hilversum</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.86</td></tr>
+<tr><td>hovenier delft</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€2.95</td></tr>
+<tr><td>hovenier lelystad</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.36</td></tr>
+<tr><td>hovenier veenendaal</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.77</td></tr>
+<tr><td>hovenier alkmaar</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€4.06</td></tr>
+<tr><td>hovenier culemborg</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.56</td></tr>
+<tr><td>hovenier barneveld</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€2.90</td></tr>
+<tr><td>kok hovenier</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€0.69</td></tr>
+<tr><td>hovenier alphen aan den rijn</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€2.94</td></tr>
+<tr><td>hovenier engels</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>hovenier hengelo</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.62</td></tr>
+<tr><td>hovenier barendrecht</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€4.14</td></tr>
+<tr><td>hovenier spijkenisse</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€3.13</td></tr>
+<tr><td>werk als hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.62</td></tr>
+<tr><td>hovenier putten</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€2.61</td></tr>
+<tr><td>hovenier doetinchem</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.30</td></tr>
+<tr><td>hovenier emmeloord</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€3.72</td></tr>
+<tr><td>hovenier voorburg</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€3.73</td></tr>
+<tr><td>hovenier drachten</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€3.67</td></tr>
+<tr><td>werken als hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.62</td></tr>
+<tr><td>hovenier maastricht</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.13</td></tr>
+<tr><td>hovenier ridderkerk</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€3.03</td></tr>
+<tr><td>werken bij hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.62</td></tr>
+<tr><td>hovenier offerte</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€9.68</td></tr>
+<tr><td>dijkman hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€1.27</td></tr>
+<tr><td>kosten hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€1.58</td></tr>
+<tr><td>hovenier offertes</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€9.68</td></tr>
+<tr><td>hovenier oosterhout</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€2.91</td></tr>
+<tr><td>wat doet een hovenier</td><td class="r">170</td><td><span class="ib ii">Info</span></td><td class="r">€0.82</td></tr>
+<tr><td>gezocht hovenier</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.40</td></tr>
+<tr><td>hovenier purmerend</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€4.16</td></tr>
+<tr><td>hovenier kosten</td><td class="r">170</td><td><span class="ib io">Transa</span></td><td class="r">€1.58</td></tr>
+<tr><td>hovenier in de buurt</td><td class="r">170</td><td><span class="ib ic">Com</span></td><td class="r">€2.93</td></tr>
+</tbody></table></div>
+</div></details><div class="children"><article class="pc ll" style="--uc:#c8e6c9">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Lokaal</span><span class="pt">Hovenier Breda</span><span class="sb sn">Nieuw</span><span class="tb">Lokale landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/hovenier/breda/</code></div>
+<div class="pst"><span class="si">📊 920 vol/mnd</span><span class="si">🔑 6 zoekwoorden</span><span class="si">🔍 hovenier breda</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Lokale landingspagina: alle diensten in Breda, referentieprojecten Breda, Google Business Profile integratie, reviews, NAP-gegevens. SERP 70% hoveniersbedrijven. 80% SERP-overlap hovenier breda ↔ tuinaanleg breda = zelfde pagina.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>hovenier breda</td><td class="r">390</td><td><span class="ib ic">Com</span></td><td class="r">€5.87</td></tr>
+<tr><td>tuinaanleg breda</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€5.93</td></tr>
+<tr><td>hoveniersbedrijf breda</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€3.20</td></tr>
+<tr><td>tuinonderhoud breda</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€3.07</td></tr>
+<tr><td>tuinontwerp breda</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€2.81</td></tr>
+<tr><td>tuinarchitect breda</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€3.44</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc ll" style="--uc:#f0f4c3">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Lokaal</span><span class="pt">Hovenier Tilburg</span><span class="sb sn">Nieuw</span><span class="tb">Lokale landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/hovenier/tilburg/</code></div>
+<div class="pst"><span class="si">📊 450 vol/mnd</span><span class="si">🔑 3 zoekwoorden</span><span class="si">🔍 hovenier tilburg</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Lokale landingspagina: diensten in regio Tilburg, bereikbaarheid vanuit Breda, lokale referenties.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>hovenier tilburg</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€5.49</td></tr>
+<tr><td>tuinaanleg tilburg</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€6.08</td></tr>
+<tr><td>tuinonderhoud tilburg</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€6.88</td></tr>
+</tbody></table></div>
+</div></details></article>
+<article class="pc ll" style="--uc:#d7ccc8">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Lokaal</span><span class="pt">Hovenier Etten-Leur</span><span class="sb sn">Nieuw</span><span class="tb">Lokale landingspagina</span><span class="ib ic">Commercieel</span></div>
+<div class="pur"><code class="ud">/hovenier/etten-leur/</code></div>
+<div class="pst"><span class="si">📊 580 vol/mnd</span><span class="si">🔑 6 zoekwoorden</span><span class="si">🔍 hovenier etten-leur</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Lokale landingspagina: diensten in Etten-Leur, nabijheid Breda, lokale referenties.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>hovenier etten leur</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€2.93</td></tr>
+<tr><td>hovenier etten-leur</td><td class="r">210</td><td><span class="ib ic">Com</span></td><td class="r">€2.93</td></tr>
+<tr><td>tuinaanleg etten-leur</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.28</td></tr>
+<tr><td>tuinaanleg etten leur</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€5.28</td></tr>
+<tr><td>tuinonderhoud etten leur</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.54</td></tr>
+<tr><td>tuinonderhoud etten-leur</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.54</td></tr>
+</tbody></table></div>
+</div></details></article>
+</div></article>
+<article class="pc lp" style="--uc:#d1c4e9">
+<details><summary class="ps">
+<div class="pm">
+<div class="ptr"><span class="ni">Pillar</span><span class="pt">Bestrating</span><span class="sb se">Bestaand</span><span class="tb">Landingspagina</span><span class="ib ii">Informationeel</span></div>
+<div class="pur"><code class="ud">/tuinaanleg/bestrating/</code></div>
+<div class="pst"><span class="si">📊 16.430 vol/mnd</span><span class="si">🔑 50 zoekwoorden</span><span class="si">🔍 bestrating</span></div>
+</div><span class="ti">▼</span>
+</summary>
+<div class="pd"><div class="ct">Dienst-subpagina onder tuinaanleg: materiaalopties (klinkers, tegels, natuursteen), kostenindicaties, inspiratiefoto&#x27;s, combinatie met groen. SERP mix van webshops en hoveniers.</div>
+<div class="ktw"><table class="kt"><thead><tr><th>Zoekwoord</th><th class="r">Volume</th><th>Intentie</th><th class="r">CPC</th></tr></thead>
+<tbody><tr><td>bestrating</td><td class="r">5.400</td><td><span class="ib ii">Info</span></td><td class="r">€1.06</td></tr>
+<tr><td>bestrating tuin</td><td class="r">1.300</td><td><span class="ib io">Transa</span></td><td class="r">€1.20</td></tr>
+<tr><td>tuin bestrating</td><td class="r">1.300</td><td><span class="ib ic">Com</span></td><td class="r">€1.48</td></tr>
+<tr><td>tuin bestraten</td><td class="r">1.300</td><td><span class="ib ii">Info</span></td><td class="r">€1.48</td></tr>
+<tr><td>tuinaanleg bestrating</td><td class="r">1.000</td><td><span class="ib ic">Com</span></td><td class="r">€0.89</td></tr>
+<tr><td>bestrating tuin kosten</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€2.41</td></tr>
+<tr><td>tuin bestrating kosten</td><td class="r">480</td><td><span class="ib ic">Com</span></td><td class="r">€2.41</td></tr>
+<tr><td>ideeën tuin bestrating</td><td class="r">390</td><td><span class="ib io">Transa</span></td><td class="r">€0.41</td></tr>
+<tr><td>voorbeeld bestrating tuin</td><td class="r">320</td><td><span class="ib io">Transa</span></td><td class="r">€0.85</td></tr>
+<tr><td>tuin bestrating voorbeelden</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€0.85</td></tr>
+<tr><td>bestrating voorbeelden tuin</td><td class="r">320</td><td><span class="ib io">Transa</span></td><td class="r">€0.85</td></tr>
+<tr><td>voorbeelden bestrating tuin</td><td class="r">320</td><td><span class="ib io">Transa</span></td><td class="r">€0.85</td></tr>
+<tr><td>bestrating tuin voorbeelden</td><td class="r">320</td><td><span class="ib ic">Com</span></td><td class="r">€0.85</td></tr>
+<tr><td>tuin bestrating ideeen</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.93</td></tr>
+<tr><td>tuin bestrating ideeën</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.93</td></tr>
+<tr><td>voorbeelden bestrating kleine tuin</td><td class="r">260</td><td><span class="ib io">Transa</span></td><td class="r">€0.98</td></tr>
+<tr><td>tuin bestrating idee</td><td class="r">260</td><td><span class="ib ic">Com</span></td><td class="r">€0.93</td></tr>
+<tr><td>tuin bestrating inspiratie</td><td class="r">210</td><td><span class="ib io">Transa</span></td><td class="r">€1.04</td></tr>
+<tr><td>wat kost tuin bestrating</td><td class="r">140</td><td><span class="ib ic">Com</span></td><td class="r">€1.81</td></tr>
+<tr><td>wat kost bestrating tuin</td><td class="r">140</td><td><span class="ib io">Transa</span></td><td class="r">€1.81</td></tr>
+<tr><td>tuin bestrating aanleggen</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€2.31</td></tr>
+<tr><td>tuin en bestrating boxmeer</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€0.74</td></tr>
+<tr><td>tuin &amp; bestrating boxmeer</td><td class="r">110</td><td><span class="ib ic">Com</span></td><td class="r">€0.09</td></tr>
+<tr><td>lambeck bestrating en tuinaanleg</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>goedkope tuin bestrating</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€1.34</td></tr>
+<tr><td>bestrating tuin goedkoop</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€1.85</td></tr>
+<tr><td>tuin bestrating almere</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.22</td></tr>
+<tr><td>tuin bestrating kopen</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€0.92</td></tr>
+<tr><td>bestrating tuin almere</td><td class="r">90</td><td><span class="ib ic">Com</span></td><td class="r">€2.22</td></tr>
+<tr><td>tuin bestrating goedkoop</td><td class="r">90</td><td><span class="ib io">Transa</span></td><td class="r">€1.85</td></tr>
+<tr><td>tuin bestrating enschede</td><td class="r">70</td><td><span class="ib ic">Com</span></td><td class="r">€6.17</td></tr>
+<tr><td>van dijk tuin en bestrating</td><td class="r">50</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>bestrating leggen</td><td class="r">50</td><td><span class="ib ii">Info</span></td><td class="r">€2.19</td></tr>
+<tr><td>tuin bestrating laten aanleggen</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€3.06</td></tr>
+<tr><td>tuin en bestrating</td><td class="r">40</td><td><span class="ib ic">Com</span></td><td class="r">€0.75</td></tr>
+<tr><td>arjan tuin en bestrating</td><td class="r">40</td><td><span class="ib ii">Info</span></td><td class="r">€0.00</td></tr>
+<tr><td>bestrating kleine tuin</td><td class="r">40</td><td><span class="ib io">Transa</span></td><td class="r">€0.57</td></tr>
+<tr><td>gerritzen tuin en bestrating</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+<tr><td>tuin bestrating haarlem</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.93</td></tr>
+<tr><td>bestrating tuin aanleggen</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€1.82</td></tr>
+<tr><td>goedkoopste bestrating tuin</td><td class="r">30</td><td><span class="ib io">Transa</span></td><td class="r">€0.64</td></tr>
+<tr><td>tuin bestrating amsterdam</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€6.58</td></tr>
+<tr><td>voorbeelden tuin bestrating</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.50</td></tr>
+<tr><td>moderne bestrating tuin</td><td class="r">30</td><td><span class="ib io">Transa</span></td><td class="r">€0.35</td></tr>
+<tr><td>goedkope bestrating tuin</td><td class="r">30</td><td><span class="ib io">Transa</span></td><td class="r">€0.64</td></tr>
+<tr><td>bestrating kleine tuin groot laten lijken</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.32</td></tr>
+<tr><td>voorbeeld tuin bestrating</td><td class="r">30</td><td><span class="ib ic">Com</span></td><td class="r">€0.50</td></tr>
+<tr><td>bestrating landelijke tuin</td><td class="r">20</td><td><span class="ib io">Transa</span></td><td class="r">€1.07</td></tr>
+<tr><td>tuin bestrating showroom</td><td class="r">20</td><td><span class="ib ic">Com</span></td><td class="r">€1.39</td></tr>
+<tr><td>hermans tuin en bestrating</td><td class="r">20</td><td><span class="ib ic">Com</span></td><td class="r">€0.00</td></tr>
+</tbody></table></div>
+</div></details></article>
+
+
+</section>
+
+<!-- ============ NAVIGATION VIEW ============ -->
+<section class="nav-section" id="view-nav">
+
+<div class="section-hdr">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d5016" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+Aanbevolen Navigatiestructuur
+</div>
+
+<div class="nav-description">
+<h3>Hoofdnavigatie (top-level menu)</h3>
+<p>Op basis van de pillar-cluster structuur zijn dit de aanbevolen hoofdmenu-items. Elk item vertegenwoordigt een pillar page of logische groepering. De subnavigatie toont de onderliggende cluster- en subpagina's.</p>
+<p><strong>Huidige navigatie:</strong> Ontwerp, Aanleg, Onderhoud, Beveiliging, Over Ons, Vacatures, Contact</p>
+<p><strong>Aanbevolen navigatie:</strong> Tuinontwerp, Tuinaanleg (met mega-menu voor tuinstijlen + diensten), Tuinonderhoud, Hovenier (met lokale pagina's), Blog/Magazine, Over Ons, Contact</p>
+</div>
+
+<!-- Nav Bar Preview -->
+<div class="proposed-nav">
+<div class="nav-bar">
+<div class="nav-logo">Kamsteeg <span>Tuinen</span></div>
+<div class="nav-items">
+<a href="#" class="nav-item">Tuinontwerp</a>
+<a href="#" class="nav-item">Tuinaanleg</a>
+<a href="#" class="nav-item">Tuinonderhoud</a>
+<a href="#" class="nav-item">Hovenier</a>
+<a href="#" class="nav-item">Blog</a>
+<a href="#" class="nav-item">Over Ons</a>
+<a href="#" class="nav-item">Contact</a>
+</div>
+</div>
+
+<!-- Nav Tree -->
+<div class="nav-tree">
+<ul>
+<li class="nav-l1"><a href="/tuinontwerp/">Tuinontwerp</a>
+<ul class="nav-l2">
+<li><a href="/tuinontwerp/tuinarchitect/">Tuinarchitect</a></li>
+<li><a href="/tuinontwerp/beplantingsplan/">Beplantingsplan</a></li>
+</ul>
+</li>
+<li class="nav-l1"><a href="/tuinaanleg/">Tuinaanleg</a>
+<ul class="nav-l2">
+<li><a href="/tuinaanleg/borders/">Borders</a></li>
+<li><a href="/tuinaanleg/bestrating/">Bestrating</a></li>
+<li><a href="/tuinaanleg/zwemvijver/">Zwemvijver & Waterpartij</a></li>
+<li><a href="/tuinaanleg/tuin-renoveren/">Tuin Renoveren</a></li>
+<li><a href="/tuinaanleg/bedrijfstuin/">Bedrijfstuin & Zakelijk</a></li>
+<li class="nav-divider"></li>
+<li class="nav-subheader">Tuinstijlen</li>
+<li><a href="/tuinaanleg/moderne-tuin/">Moderne Tuin</a></li>
+<li><a href="/tuinaanleg/mediterrane-tuin/">Mediterrane Tuin</a></li>
+<li><a href="/tuinaanleg/stadstuin/">Stadstuin</a></li>
+<li><a href="/tuinaanleg/landelijke-tuin/">Landelijke Tuin</a></li>
+<li><a href="/tuinaanleg/ecologische-tuin/">Ecologische Tuin</a></li>
+<li><a href="/tuinaanleg/natuurlijke-tuin/">Natuurlijke Tuin</a></li>
+<li><a href="/tuinaanleg/boerderijtuin/">Boerderijtuin</a></li>
+<li><a href="/tuinaanleg/villatuin/">Villatuin</a></li>
+<li><a href="/tuinaanleg/strandtuin/">Strandtuin</a></li>
+</ul>
+</li>
+<li class="nav-l1"><a href="/tuinonderhoud/">Tuinonderhoud</a></li>
+<li class="nav-l1"><a href="/hovenier/">Hovenier</a>
+<ul class="nav-l2">
+<li><a href="/hovenier/breda/">Hovenier Breda</a></li>
+<li><a href="/hovenier/tilburg/">Hovenier Tilburg</a></li>
+<li><a href="/hovenier/etten-leur/">Hovenier Etten-Leur</a></li>
+</ul>
+</li>
+<li class="nav-l1"><a href="/blog/tuin-inspiratie/">Blog / Magazine</a>
+<ul class="nav-l2">
+<li><a href="/blog/tuin-inspiratie/">Tuin Inspiratie & Ideeën</a></li>
+<li><a href="/blog/tuinverlichting/">Tuinverlichting</a></li>
+<li><a href="/blog/voortuin-ideeën/">Voortuin Ideeën</a></li>
+<li><a href="/blog/overkapping-tuin/">Overkapping & Pergola</a></li>
+<li><a href="/blog/kleine-tuin-inrichten/">Kleine Tuin Inrichten</a></li>
+<li><a href="/blog/onderhoudsarme-tuin/">Onderhoudsarme Tuin</a></li>
+<li><a href="/blog/schutting-tuin/">Schutting & Afscheiding</a></li>
+<li><a href="/blog/kindvriendelijke-tuin/">Kindvriendelijke Tuin</a></li>
+<li><a href="/blog/tuin-op-het-zuiden/">Tuin op het Zuiden</a></li>
+</ul>
+</li>
+<li class="nav-l1"><a href="/over-ons/">Over Ons</a></li>
+<li class="nav-l1"><a href="/contact/">Contact</a></li>
+</ul>
+</div>
+</div>
+
+<!-- HTML Code -->
+<div class="nav-description">
+<h3>HTML-code voor navigatie</h3>
+<p>Kopieer onderstaande <code>&lt;nav&gt;</code> structuur als basis voor het menu:</p>
+</div>
+<div class="code-block"><pre><span class="cmt">&lt;!-- Kamsteeg Tuinen - Aanbevolen navigatiestructuur --&gt;</span>
+<span class="tag">&lt;nav</span> <span class="attr">aria-label</span>=<span class="str">"Hoofdnavigatie"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinontwerp/"</span><span class="tag">&gt;</span>Tuinontwerp<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinontwerp/tuinarchitect/"</span><span class="tag">&gt;</span>Tuinarchitect<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinontwerp/beplantingsplan/"</span><span class="tag">&gt;</span>Beplantingsplan<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/"</span><span class="tag">&gt;</span>Tuinaanleg<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="cmt">&lt;!-- Diensten --&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/borders/"</span><span class="tag">&gt;</span>Borders<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/bestrating/"</span><span class="tag">&gt;</span>Bestrating<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/zwemvijver/"</span><span class="tag">&gt;</span>Zwemvijver<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/tuin-renoveren/"</span><span class="tag">&gt;</span>Tuin Renoveren<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/bedrijfstuin/"</span><span class="tag">&gt;</span>Bedrijfstuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="cmt">&lt;!-- Tuinstijlen --&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/moderne-tuin/"</span><span class="tag">&gt;</span>Moderne Tuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/mediterrane-tuin/"</span><span class="tag">&gt;</span>Mediterrane Tuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/stadstuin/"</span><span class="tag">&gt;</span>Stadstuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/landelijke-tuin/"</span><span class="tag">&gt;</span>Landelijke Tuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/ecologische-tuin/"</span><span class="tag">&gt;</span>Ecologische Tuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/natuurlijke-tuin/"</span><span class="tag">&gt;</span>Natuurlijke Tuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/boerderijtuin/"</span><span class="tag">&gt;</span>Boerderijtuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/villatuin/"</span><span class="tag">&gt;</span>Villatuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinaanleg/strandtuin/"</span><span class="tag">&gt;</span>Strandtuin<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/tuinonderhoud/"</span><span class="tag">&gt;</span>Tuinonderhoud<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/hovenier/"</span><span class="tag">&gt;</span>Hovenier<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/hovenier/breda/"</span><span class="tag">&gt;</span>Hovenier Breda<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/hovenier/tilburg/"</span><span class="tag">&gt;</span>Hovenier Tilburg<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/hovenier/etten-leur/"</span><span class="tag">&gt;</span>Hovenier Etten-Leur<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/blog/tuin-inspiratie/"</span><span class="tag">&gt;</span>Blog<span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/blog/tuin-inspiratie/"</span><span class="tag">&gt;</span>Tuin Inspiratie<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/blog/tuinverlichting/"</span><span class="tag">&gt;</span>Tuinverlichting<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="cmt">&lt;!-- ... overige blog pagina's --&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/over-ons/"</span><span class="tag">&gt;</span>Over Ons<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="str">"/contact/"</span><span class="tag">&gt;</span>Contact<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/nav&gt;</span></pre></div>
+
+</section>
+
+<!-- ============ URL COLOR LEGEND ============ -->
+<section class="nav-section" id="view-urls">
+
+<div class="section-hdr">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d5016" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+URL Kleurenlegenda — Alle 34 unieke URL's
+</div>
+
+<div class="url-legend">
+<h3>Elke unieke URL heeft een eigen achtergrondkleur in de hiërarchieweergave</h3>
+<div class="url-grid">
+<div class="url-chip" style="background:#dcedc8"><code>/blog/kindvriendelijke-tuin/</code><span class="vol">320</span></div>
+<div class="url-chip" style="background:#ffe0b2"><code>/blog/kleine-tuin-inrichten/</code><span class="vol">1.780</span></div>
+<div class="url-chip" style="background:#bbdefb"><code>/blog/onderhoudsarme-tuin/</code><span class="vol">1.170</span></div>
+<div class="url-chip" style="background:#f8bbd0"><code>/blog/overkapping-tuin/</code><span class="vol">1.300</span></div>
+<div class="url-chip" style="background:#e1bee7"><code>/blog/schutting-tuin/</code><span class="vol">1.390</span></div>
+<div class="url-chip" style="background:#b2dfdb"><code>/blog/tuin-inspiratie/</code><span class="vol">25.870</span></div>
+<div class="url-chip" style="background:#fff9c4"><code>/blog/tuin-op-het-zuiden/</code><span class="vol">580</span></div>
+<div class="url-chip" style="background:#c5cae9"><code>/blog/tuinverlichting/</code><span class="vol">9.900</span></div>
+<div class="url-chip" style="background:#ffccbc"><code>/blog/voortuin-ideeën/</code><span class="vol">2.900</span></div>
+<div class="url-chip" style="background:#b2ebf2"><code>/hovenier/</code><span class="vol">43.570</span></div>
+<div class="url-chip" style="background:#c8e6c9"><code>/hovenier/breda/</code><span class="vol">920</span></div>
+<div class="url-chip" style="background:#d7ccc8"><code>/hovenier/etten-leur/</code><span class="vol">580</span></div>
+<div class="url-chip" style="background:#f0f4c3"><code>/hovenier/tilburg/</code><span class="vol">450</span></div>
+<div class="url-chip" style="background:#b3e5fc"><code>/tuinaanleg/</code><span class="vol">10.680</span></div>
+<div class="url-chip" style="background:#ffcdd2"><code>/tuinaanleg/bedrijfstuin/</code><span class="vol">3.000</span></div>
+<div class="url-chip" style="background:#d1c4e9"><code>/tuinaanleg/bestrating/</code><span class="vol">16.430</span></div>
+<div class="url-chip" style="background:#c5e1a5"><code>/tuinaanleg/boerderijtuin/</code><span class="vol">210</span></div>
+<div class="url-chip" style="background:#ffe082"><code>/tuinaanleg/borders/</code><span class="vol">7.310</span></div>
+<div class="url-chip" style="background:#90caf9"><code>/tuinaanleg/ecologische-tuin/</code><span class="vol">870</span></div>
+<div class="url-chip" style="background:#f48fb1"><code>/tuinaanleg/landelijke-tuin/</code><span class="vol">1.090</span></div>
+<div class="url-chip" style="background:#ce93d8"><code>/tuinaanleg/mediterrane-tuin/</code><span class="vol">2.900</span></div>
+<div class="url-chip" style="background:#80cbc4"><code>/tuinaanleg/moderne-tuin/</code><span class="vol">4.630</span></div>
+<div class="url-chip" style="background:#fff176"><code>/tuinaanleg/natuurlijke-tuin/</code><span class="vol">720</span></div>
+<div class="url-chip" style="background:#9fa8da"><code>/tuinaanleg/stadstuin/</code><span class="vol">2.400</span></div>
+<div class="url-chip" style="background:#ef9a9a"><code>/tuinaanleg/strandtuin/</code><span class="vol">170</span></div>
+<div class="url-chip" style="background:#80deea"><code>/tuinaanleg/tuin-renoveren/</code><span class="vol">1.270</span></div>
+<div class="url-chip" style="background:#a5d6a7"><code>/tuinaanleg/villatuin/</code><span class="vol">50</span></div>
+<div class="url-chip" style="background:#bcaaa4"><code>/tuinaanleg/zwemvijver/</code><span class="vol">11.360</span></div>
+<div class="url-chip" style="background:#e6ee9c"><code>/tuinaanleg/zwemvijver/tuin-met-zwembad/</code><span class="vol">6.040</span></div>
+<div class="url-chip" style="background:#81d4fa"><code>/tuinaanleg/zwemvijver/waterpartij/</code><span class="vol">990</span></div>
+<div class="url-chip" style="background:#ffab91"><code>/tuinonderhoud/</code><span class="vol">6.760</span></div>
+<div class="url-chip" style="background:#b39ddb"><code>/tuinontwerp/</code><span class="vol">8.120</span></div>
+<div class="url-chip" style="background:#aed581"><code>/tuinontwerp/beplantingsplan/</code><span class="vol">720</span></div>
+<div class="url-chip" style="background:#ffca28"><code>/tuinontwerp/tuinarchitect/</code><span class="vol">1.900</span></div>
+
+</div>
+</div>
+
+</section>
+
+</div><!-- /main-wrap -->
+
+<footer class="page-footer">
+<p>Kamsteeg Tuinen — SEO Pillar-Cluster Dashboard — 18 maart 2026</p>
+<p><a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a></p>
+</footer>
+
+<script>
+function switchView(view) {
+    document.querySelectorAll('.vb').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-view="'+view+'"]').classList.add('active');
+    
+    const hierarchy = document.getElementById('view-hierarchy');
+    const nav = document.getElementById('view-nav');
+    const urls = document.getElementById('view-urls');
+    
+    hierarchy.classList.toggle('hidden', view !== 'hierarchy');
+    hierarchy.classList.toggle('active', view === 'hierarchy');
+    nav.classList.toggle('active', view === 'nav');
+    urls.classList.toggle('active', view === 'urls');
+    
+    // Reset hierarchy to block display mode
+    if (view === 'hierarchy') {
+        hierarchy.style.display = 'block';
+    } else {
+        hierarchy.style.display = 'none';
+    }
+    nav.style.display = view === 'nav' ? 'block' : 'none';
+    urls.style.display = view === 'urls' ? 'block' : 'none';
+}
+
+// Expand/collapse all
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'e' && e.altKey) {
+        document.querySelectorAll('details').forEach(d => d.open = !d.open);
+    }
+});
+
+// Initialize
+document.getElementById('view-hierarchy').style.display = 'block';
+document.getElementById('view-nav').style.display = 'none';
+document.getElementById('view-urls').style.display = 'none';
+</script>
+</body>
+</html>
